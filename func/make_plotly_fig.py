@@ -22,8 +22,6 @@ def make_plotly_fig(dfx):
 
 
 def make_figure2(df):
-    # create offline plotly bar plot from dataframe
-    # create offline plotly bar plot from dataframe
     
     # calculate standard error of the mean
     sem = np.std(df, axis=0, ddof=1) / np.sqrt(df.shape[0])*100
@@ -32,12 +30,14 @@ def make_figure2(df):
     average_values = df.mean()*100
     average_values = average_values.values.tolist()
     fig = go.Figure(data=go.Scatter(
-            x= [0 ,1],
+            x= ['Without Averaging' ,'With Averaging'],
             y=average_values,
             error_y=dict(
                 type='data', # value of error bar given in data coordinates
                 array=sem,
                 visible=True)
         ))
+    
+    
     
     return fig

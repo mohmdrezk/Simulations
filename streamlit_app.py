@@ -1,3 +1,4 @@
+from math import ceil
 from sklearn.datasets import make_blobs
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -20,29 +21,28 @@ num_categs = st.sidebar.slider('Number of Categories', 2, 3, 2)
 num_features = st.sidebar.slider('Number of features', 2, 40, 2) 
 
 if data_gen_technique == 'make_classification':
-    num_informative = st.sidebar.slider('Number of informative features', 1, num_features, 1) 
+    percent_informative = st.sidebar.slider('% of informative features', 1, 100, 100) 
+    num_informative = ceil(percent_informative/100*num_features)
     class_separation = st.sidebar.slider('Class Separation', 0.1, 2.0, 1.0) 
 
 elif data_gen_technique == 'make_blobs':
     cluster_std = st.sidebar.slider('Cluster std', 0.1, 20.0, 1.0)
     
 # create streamlit app
-st.title('Streamlit SVM')
-st.markdown('This app is a demo of a SVM classifier using Streamlit.')
+st.title('Simulation - SVM')
+st.markdown('This app is a demo of a SVM classifier on simulated data.')
 
 if data_gen_technique == 'make_classification':
     df = generate_data_classif(num_runs,num_reps, num_categs, 
                                num_features, num_informative, class_separation)
+    
+    st.write('Number of features:', num_features)
+    st.write('Number of informative features:', num_informative)
+    
 elif data_gen_technique == 'make_blobs':
     df = generate_data(num_runs,num_reps, num_categs, num_features, cluster_std=cluster_std)
  
-    
-
-
-# df = generate_data(num_runs,num_reps, num_categs, num_features, cluster_std=cluster_std)
-                #    n_informative=num_informative,n_redundant=num_redundant)
-                
-
+ 
 fig_output = make_plotly_fig(df)
 st.plotly_chart(fig_output, use_container_width=True, height=600)
 
@@ -50,14 +50,11 @@ if num_features>2:
     st.warning(f'NOTE: Figure displaying ONLY the first 2 dimensions of the data. \n REAL data has {num_features} dimensions.')
     # st.write('REAL data has {} dimensions.'.format(num_features))
 
-
 print(df.head(5))
-
 
 num_CVs = df['CV'].nunique()
 accuracy = []
 accuracy_avg = []
-
 
 for iCV in range(1,num_CVs+1):
 
@@ -81,13 +78,12 @@ d = {'Accuracy': accuracy, 'Accuracy_avg': accuracy_avg}
 x= pd.DataFrame(d)
 
 
-
-
-# create offline plotly bar plot from dataframe
-
-    
-    # return go.Figure(data=data, layout=layout)
-    
 st.plotly_chart(make_figure2(x))
 
+
+
+st.header('Data used in classification')
+st.dataframe(df)
+
+st.header('Acurracy results without and with averaging')
 st.dataframe(x)
